@@ -52,6 +52,9 @@ func (c *Client) GetWorkflows() (*WorkflowsResponse, error) {
 	return &allWorkflows, nil
 }
 
+// GetWorkflow - Retrieves a workflow.
+func (c *Client) GetWorkflow(workflowID string) (*Workflow, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/v1/workflows/%s", c.HostURL, workflowID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +64,11 @@ func (c *Client) GetWorkflows() (*WorkflowsResponse, error) {
 		return nil, err
 	}
 
-	var response WorkflowsResponse
-	err = json.Unmarshal(body, &response)
+	workflow := Workflow{}
+	err = json.Unmarshal(body, &workflow)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response, nil
+	return &workflow, nil
 }
