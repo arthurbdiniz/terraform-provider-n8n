@@ -83,6 +83,13 @@ First, find the `GOBIN` path where Go installs your binaries. Your path may vary
 
 If the `GOBIN` go environment variable is not set, use the default path, `/home/<Username>/go/bin` (Linux) or `/Users/<Username>/go/bin` (Mac).
 
+```shell
+# Linux
+export GOBIN=/home/<Username>/go/bin
+
+# MacOS
+export GOBIN=/Users/<Username>/go/bin
+```
 
 Create a new file called `.terraformrc` in your home directory (`~`), then add the `dev_overrides` block below. Change the `<PATH>` to the value returned from the `go env GOBIN` command above.
 
