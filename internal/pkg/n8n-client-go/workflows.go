@@ -72,3 +72,24 @@ func (c *Client) GetWorkflow(workflowID string) (*Workflow, error) {
 
 	return &workflow, nil
 }
+
+// DeleteWorkflow - Deletes a workflow.
+func (c *Client) DeleteWorkflow(workflowID string) (*Workflow, error) {
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/api/v1/workflows/%s", c.HostURL, workflowID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	workflow := Workflow{}
+	err = json.Unmarshal(body, &workflow)
+	if err != nil {
+		return nil, err
+	}
+
+	return &workflow, nil
+}
