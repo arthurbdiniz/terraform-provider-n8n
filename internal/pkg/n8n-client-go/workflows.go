@@ -93,3 +93,23 @@ func (c *Client) DeleteWorkflow(workflowID string) (*Workflow, error) {
 
 	return &workflow, nil
 }
+
+// DeactivateWorkflow - Deactivates a workflow by its ID.
+func (c *Client) DeactivateWorkflow(workflowID string) (*Workflow, error) {
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/workflows/%s/deactivate", c.HostURL, workflowID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	workflow := Workflow{}
+	if err := json.Unmarshal(body, &workflow); err != nil {
+		return nil, err
+	}
+
+	return &workflow, nil
+}

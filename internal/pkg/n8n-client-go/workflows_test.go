@@ -134,3 +134,37 @@ func TestDeleteWorkflow(t *testing.T) {
 		t.Errorf("unexpected workflow data: %+v", workflow)
 	}
 }
+
+func TestDeactivateWorkflow(t *testing.T) {
+	mockResponse := `{"id": "2tUt1wbLX592XDdX", "name": "Deactivated Workflow", "active": false}`
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("expected POST request, got %s", r.Method)
+		}
+		if r.URL.Path != "/api/v1/workflows/2tUt1wbLX592XDdX/deactivate" {
+			t.Errorf("unexpected URL path: %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusOK)
+		if _, err := w.Write([]byte(mockResponse)); err != nil {
+			t.Errorf("failed to write response: %v", err)
+		}
+	})
+
+	ts := httptest.NewServer(handler)
+	defer ts.Close()
+
+	token := "test-token"
+	client, err := NewClient(&ts.URL, &token)
+	if err != nil {
+		t.Fatalf("failed to create client: %v", err)
+	}
+
+	workflow, err := client.DeactivateWorkflow("2tUt1wbLX592XDdX")
+	if err != nil {
+		t.Fatalf("DeactivateWorkflow returned an error: %v", err)
+	}
+
+	if workflow.ID != "2tUt1wbLX592XDdX" || workflow.Name != "Deactivated Workflow" || workflow.Active {
+		t.Errorf("unexpected workflow data: %+v", workflow)
+	}
+}
