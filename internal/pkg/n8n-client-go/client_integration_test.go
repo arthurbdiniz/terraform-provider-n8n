@@ -32,7 +32,13 @@ func TestIntegrationDoRequest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	defer container.Terminate(ctx) // Ensure container is cleaned up
+
+	// Ensure container is cleaned up
+	defer func() {
+		if err := container.Terminate(ctx); err != nil {
+			fmt.Println("Error when terminating container:", err)
+		}
+	}()
 
 	// Get the mapped port
 	host, err := container.Host(ctx)
