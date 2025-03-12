@@ -17,9 +17,9 @@ import (
 func TestIntegrationDoRequest(t *testing.T) {
 	// Create a test container request
 	req := testcontainers.ContainerRequest{
-		Image:        "docker.n8n.io/n8nio/n8n:latest", // Replace with your API container image
+		Image:        "docker.n8n.io/n8nio/n8n:latest",
 		ExposedPorts: []string{"5678/tcp"},
-		WaitingFor:   wait.ForHTTP("/healthz").WithPort("5678").WithStartupTimeout(30 * time.Second),
+		WaitingFor:   wait.ForLog("http://localhost:5678/").WithStartupTimeout(30 * time.Second),
 	}
 
 	ctx := context.Background()
