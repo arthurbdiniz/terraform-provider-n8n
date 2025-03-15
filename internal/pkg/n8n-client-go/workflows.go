@@ -31,7 +31,7 @@ func (c *Client) GetWorkflows() (*WorkflowsResponse, error) {
 			return nil, err
 		}
 
-		body, err := c.doRequest(req, nil)
+		body, err := c.doRequest(req)
 		if err != nil {
 			return nil, err
 		}
@@ -59,7 +59,7 @@ func (c *Client) GetWorkflow(workflowID string) (*Workflow, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, nil)
+	body, err := c.doRequest(req)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (c *Client) DeleteWorkflow(workflowID string) (*Workflow, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, nil)
+	body, err := c.doRequest(req)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (c *Client) DeactivateWorkflow(workflowID string) (*Workflow, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, nil)
+	body, err := c.doRequest(req)
 	if err != nil {
 		return nil, err
 	}
