@@ -34,12 +34,8 @@ func NewClient(host, token *string) (*Client, error) {
 	return &c, nil
 }
 
-func (c *Client) doRequest(req *http.Request, authToken *string) ([]byte, error) {
+func (c *Client) doRequest(req *http.Request) ([]byte, error) {
 	token := c.Token
-
-	if authToken != nil {
-		token = *authToken
-	}
 
 	req.Header.Set("X-N8N-API-KEY", token)
 

@@ -53,44 +53,7 @@ func TestDoRequest(t *testing.T) {
 		t.Fatalf("failed to create request: %v", err)
 	}
 
-	respBody, err := client.doRequest(req, nil)
-	if err != nil {
-		t.Fatalf("doRequest returned an error: %v", err)
-	}
-
-	if string(respBody) != mockResponse {
-		t.Errorf("expected response body %s, got %s", mockResponse, string(respBody))
-	}
-}
-
-func TestDoRequestWithAuthToken(t *testing.T) {
-	mockResponse := `{"message": "authorized"}`
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("X-N8N-API-KEY") != "override-token" {
-			t.Errorf("expected token override-token, got %s", r.Header.Get("X-N8N-API-KEY"))
-		}
-		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write([]byte(mockResponse)); err != nil {
-			t.Errorf("failed to write response: %v", err)
-		}
-	})
-
-	ts := httptest.NewServer(handler)
-	defer ts.Close()
-
-	token := "test-token"
-	client, err := NewClient(&ts.URL, &token)
-	if err != nil {
-		t.Fatalf("failed to create client: %v", err)
-	}
-
-	overrideToken := "override-token"
-	req, err := http.NewRequest(http.MethodGet, ts.URL, nil)
-	if err != nil {
-		t.Fatalf("failed to create request: %v", err)
-	}
-
-	respBody, err := client.doRequest(req, &overrideToken)
+	respBody, err := client.doRequest(req)
 	if err != nil {
 		t.Fatalf("doRequest returned an error: %v", err)
 	}
