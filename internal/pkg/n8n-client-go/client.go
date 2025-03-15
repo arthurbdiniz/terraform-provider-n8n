@@ -10,25 +10,26 @@ import (
 	"time"
 )
 
-const HostURL string = "http://localhost:5678"
-
 type Client struct {
 	HostURL    string
 	HTTPClient *http.Client
 	Token      string
 }
 
-func NewClient(host, token *string) (*Client, error) {
+func NewClient(host *string, token *string) (*Client, error) {
+	if token == nil {
+		return nil, fmt.Errorf("token is required")
+	}
+
+	if host == nil {
+		return nil, fmt.Errorf("host is required")
+	}
+
 	c := Client{
 		HTTPClient: &http.Client{Timeout: 10 * time.Second},
-		// Default n8n URL
-		HostURL: HostURL,
 	}
 
-	if host != nil {
-		c.HostURL = *host
-	}
-
+	c.HostURL = *host
 	c.Token = *token
 
 	return &c, nil

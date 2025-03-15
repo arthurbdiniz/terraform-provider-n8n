@@ -27,6 +27,38 @@ func TestNewClient(t *testing.T) {
 	}
 }
 
+func TestNewClientWithoutToken(t *testing.T) {
+	host := "http://example.com"
+
+	client, err := NewClient(&host, nil)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if err.Error() != "token is required" {
+		t.Errorf("expected error message 'token is required', got %v", err)
+	}
+
+	if client != nil {
+		t.Fatal("expected nil client, got a non-nil client")
+	}
+}
+
+func TestNewClientWithoutHost(t *testing.T) {
+	token := "test-token"
+
+	client, err := NewClient(nil, &token)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if err.Error() != "host is required" {
+		t.Errorf("expected error message 'host is required', got %v", err)
+	}
+
+	if client != nil {
+		t.Fatal("expected nil client, got a non-nil client")
+	}
+}
+
 func TestDoRequest(t *testing.T) {
 	mockResponse := `{"message": "success"}`
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
