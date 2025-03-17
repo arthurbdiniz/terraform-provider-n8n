@@ -121,7 +121,7 @@ func (c *Client) ActivateWorkflow(workflowID string) (*Workflow, error) {
 		return nil, err
 	}
 
-	body, err := c.doRequest(req, nil)
+	body, err := c.doRequest(req)
 	if err != nil {
 		return nil, err
 	}
