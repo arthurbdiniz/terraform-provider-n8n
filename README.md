@@ -1,5 +1,7 @@
 # terraform-provider-n8n
 
+![Build Status](https://img.shields.io/github/check-runs/arthurbdiniz/terraform-provider-n8n/main?label=build) ![Codecov](https://img.shields.io/codecov/c/github/arthurbdiniz/terraform-provider-n8n) ![License](https://img.shields.io/github/license/arthurbdiniz/terraform-provider-n8n)
+
 This repository contains the Terraform provider for [n8n](https://n8n.io), an open-source workflow automation tool. With this provider, you can manage and automate the configuration of n8n resources directly from your Terraform infrastructure-as-code setups.
 
 > ⚠️ The n8n Terraform provider it's `under development` but the goal for the future is to allow you to manage workflows, nodes, credentials, and other resources, enabling an approach to automation workflows.
