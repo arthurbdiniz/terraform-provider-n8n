@@ -4,10 +4,40 @@
 package n8n
 
 import (
+	"errors"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
+
+// Custom RoundTripper to mock HTTPClient.
+type mockRoundTripper struct {
+	doFunc func(req *http.Request) (*http.Response, error)
+}
+
+type errorReader struct{}
+
+func (e *errorReader) Read(p []byte) (int, error) {
+	return 0, errors.New("read error")
+}
+func (e *errorReader) Close() error { return nil }
+
+func (m *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	return m.doFunc(req)
+}
+
+// Helper to create a Client with mocked HTTPClient.
+func newMockClient(doFunc func(req *http.Request) (*http.Response, error)) *Client {
+	return &Client{
+		Token:   "test-token",
+		HostURL: "http://example.com",
+		HTTPClient: &http.Client{
+			Transport: &mockRoundTripper{doFunc},
+		},
+	}
+}
 
 func TestNewClient(t *testing.T) {
 	host := "http://example.com"
@@ -92,5 +122,89 @@ func TestDoRequest(t *testing.T) {
 
 	if string(respBody) != mockResponse {
 		t.Errorf("expected response body %s, got %s", mockResponse, string(respBody))
+	}
+}
+
+func TestDoRequest_HTTPClientError(t *testing.T) {
+	client := newMockClient(func(req *http.Request) (*http.Response, error) {
+		return nil, errors.New("mocked HTTP error")
+	})
+
+	req, err := http.NewRequest("GET", client.HostURL+"/test", nil)
+	if err != nil {
+		t.Fatalf("failed to create request: %v", err)
+	}
+
+	_, err = client.doRequest(req)
+	if err == nil || !strings.Contains(err.Error(), "mocked HTTP error") {
+		t.Fatalf("expected HTTP error, got: %v", err)
+	}
+}
+
+func TestDoRequest_ReadAllError(t *testing.T) {
+	client := newMockClient(func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       &errorReader{},
+		}, nil
+	})
+
+	req, err := http.NewRequest("GET", client.HostURL+"/test", nil)
+	if err != nil {
+		t.Fatalf("failed to create request: %v", err)
+	}
+
+	_, err = client.doRequest(req)
+	if err == nil || !strings.Contains(err.Error(), "read error") {
+		t.Fatalf("expected read error, got: %v", err)
+	}
+}
+
+func TestDoRequest_Success(t *testing.T) {
+	expected := `{"message": "success"}`
+
+	client := newMockClient(func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader(expected)),
+		}, nil
+	})
+
+	req, err := http.NewRequest("GET", client.HostURL+"/test", nil)
+	if err != nil {
+		t.Fatalf("failed to create request: %v", err)
+	}
+
+	body, err := client.doRequest(req)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if string(body) != expected {
+		t.Fatalf("expected body %q, got %q", expected, string(body))
+	}
+}
+
+func TestDoRequest_Non200StatusCode(t *testing.T) {
+	client := newMockClient(func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusBadRequest,
+			Body:       io.NopCloser(strings.NewReader("bad request")),
+		}, nil
+	})
+
+	req, _ := http.NewRequest("GET", client.HostURL+"/test", nil)
+
+	body, err := client.doRequest(req)
+	if err == nil {
+		t.Fatalf("expected error due to non-200 status code")
+	}
+
+	if !strings.Contains(err.Error(), "status: 400") {
+		t.Errorf("expected error to contain status code, got: %v", err)
+	}
+
+	if body != nil {
+		t.Errorf("expected body to be nil on non-200 response")
 	}
 }
