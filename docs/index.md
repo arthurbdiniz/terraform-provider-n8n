@@ -27,3 +27,18 @@ provider "n8n" {
 
 - `host` (String) URI for n8n API. May also be provided via `N8N_HOST` environment variable.
 - `token` (String, Sensitive) Token for n8n API. May also be provided via `N8N_TOKEN` environment variable.
+
+---
+
+## n8n-client-go
+
+The [n8n-client-go](./client.md) provides a Go client for interacting with the n8n automation platform.
+
+It offers data structures and methods to handle workflows, nodes, tags, connections, and other related metadata.
+
+The client also includes an HTTP client for the communication with the n8n service, enabling you to:
+
+- Create, update, and manage workflows.
+- Handle nodes and their configurations within workflows.
+- Retrieve and manipulate metadata associated with workflows and connections.
+- Integrate the n8n service with your Go-based applications for automation tasks.
