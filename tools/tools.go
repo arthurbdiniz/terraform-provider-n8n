@@ -17,3 +17,7 @@ import (
 
 // Generate documentation.
 //go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-dir .. -provider-name n8n
+//go:generate go run ./append_docs.go
+
+// Generate client documentation.
+//go:generate gomarkdoc --output ../docs/client.md ../internal/pkg/n8n-client-go/...

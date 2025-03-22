@@ -9,12 +9,12 @@ import (
 	"net/http"
 )
 
-type WorkflowsResponse struct {
-	Data       []Workflow `json:"data"`
-	NextCursor *string    `json:"nextCursor"` // Can be null in JSON, so use a pointer
-}
-
-// GetWorkflows - Retrieve all workflows from your instance.
+// GetWorkflows retrieves all workflows from your n8n instance.
+// This method supports pagination and will automatically iterate through
+// all available pages by following the cursor in the response.
+//
+// Returns a pointer to a WorkflowsResponse containing all workflows,
+// or an error if the request or response decoding fails.
 func (c *Client) GetWorkflows() (*WorkflowsResponse, error) {
 	var allWorkflows WorkflowsResponse
 	cursor := ""
@@ -52,7 +52,12 @@ func (c *Client) GetWorkflows() (*WorkflowsResponse, error) {
 	return &allWorkflows, nil
 }
 
-// GetWorkflow - Retrieves a workflow.
+// GetWorkflow retrieves the details of a single workflow by its ID.
+//
+// Parameters:
+//   - workflowID: the unique identifier of the workflow.
+//
+// Returns a pointer to the Workflow struct, or an error if the request or decoding fails.
 func (c *Client) GetWorkflow(workflowID string) (*Workflow, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/v1/workflows/%s", c.HostURL, workflowID), nil)
 	if err != nil {
@@ -73,7 +78,12 @@ func (c *Client) GetWorkflow(workflowID string) (*Workflow, error) {
 	return &workflow, nil
 }
 
-// DeleteWorkflow - Deletes a workflow.
+// DeleteWorkflow deletes a workflow from your n8n instance by its ID.
+//
+// Parameters:
+//   - workflowID: the unique identifier of the workflow to delete.
+//
+// Returns the deleted Workflow object, or an error if the request or decoding fails.
 func (c *Client) DeleteWorkflow(workflowID string) (*Workflow, error) {
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/api/v1/workflows/%s", c.HostURL, workflowID), nil)
 	if err != nil {
@@ -94,7 +104,13 @@ func (c *Client) DeleteWorkflow(workflowID string) (*Workflow, error) {
 	return &workflow, nil
 }
 
-// DeactivateWorkflow - Deactivates a workflow by its ID.
+// DeactivateWorkflow deactivates a workflow by its ID.
+// This is typically used to temporarily disable workflow execution.
+//
+// Parameters:
+//   - workflowID: the unique identifier of the workflow to deactivate.
+//
+// Returns the updated Workflow object, or an error if the request or decoding fails.
 func (c *Client) DeactivateWorkflow(workflowID string) (*Workflow, error) {
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/workflows/%s/deactivate", c.HostURL, workflowID), nil)
 	if err != nil {
@@ -114,7 +130,13 @@ func (c *Client) DeactivateWorkflow(workflowID string) (*Workflow, error) {
 	return &workflow, nil
 }
 
-// ActivateWorkflow - Activates a workflow by its ID.
+// ActivateWorkflow activates a workflow by its ID.
+// This is typically used to enable workflow execution after creation or deactivation.
+//
+// Parameters:
+//   - workflowID: the unique identifier of the workflow to activate.
+//
+// Returns the updated Workflow object, or an error if the request or decoding fails.
 func (c *Client) ActivateWorkflow(workflowID string) (*Workflow, error) {
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/workflows/%s/activate", c.HostURL, workflowID), nil)
 	if err != nil {
