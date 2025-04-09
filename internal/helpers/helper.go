@@ -119,3 +119,20 @@ func TerminateContainer(ctx context.Context, container testcontainers.Container)
 	}
 	return nil
 }
+
+// DeferTerminate returns a cleanup function that attempts to terminate the given
+// testcontainers.Container. This is intended to be used with `defer` in tests,
+// ensuring that the container is properly shut down even if the test fails.
+//
+// Example usage:
+//
+//	defer helpers.DeferTerminate(container)()
+//
+// It logs an error message to stdout if the container termination fails.
+func DeferTerminate(container testcontainers.Container) func() {
+	return func() {
+		if err := TerminateContainer(context.Background(), container); err != nil {
+			fmt.Println("Error when terminating container:", err)
+		}
+	}
+}
