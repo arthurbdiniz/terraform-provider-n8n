@@ -4,6 +4,7 @@
 package n8n
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -154,4 +155,40 @@ func (c *Client) ActivateWorkflow(workflowID string) (*Workflow, error) {
 	}
 
 	return &workflow, nil
+}
+
+// CreateWorkflow sends a request to create a new workflow in n8n.
+// It accepts a CreateWorkflowRequest object and returns the created Workflow with its assigned ID and metadata.
+//
+// Parameters:
+//   - createWorkflowRequest: the workflow data to be created.
+//
+// Returns the created Workflow object or an error if the request or decoding fails.
+func (c *Client) CreateWorkflow(createWorkflowRequest *CreateWorkflowRequest) (*Workflow, error) {
+	// Marshal the workflow into JSON
+	payload, err := json.Marshal(createWorkflowRequest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal workflow: %w", err)
+	}
+
+	// Create the HTTP POST request
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/workflows", c.HostURL), bytes.NewReader(payload))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	// Perform the request
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	// Decode the response into a Workflow
+	workflow := &Workflow{}
+	if err := json.Unmarshal(body, workflow); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return workflow, nil
 }
