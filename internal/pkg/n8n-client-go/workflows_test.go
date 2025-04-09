@@ -8,6 +8,8 @@ import (
 	"net/http/httptest"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetWorkflows(t *testing.T) {
@@ -199,6 +201,76 @@ func TestActivateWorkflow(t *testing.T) {
 	}
 
 	if workflow.ID != "2tUt1wbLX592XDdX" || workflow.Name != "Activated Workflow" || !workflow.Active {
+		t.Errorf("unexpected workflow data: %+v", workflow)
+	}
+}
+
+func TestCreateWorkflow(t *testing.T) {
+	mockResponse := `{
+		"id": "123456",
+		"name": "Test Workflow",
+		"active": false,
+		"nodes": [{
+			"id": "1",
+			"name": "Start",
+			"type": "n8n-nodes-base.start",
+			"typeVersion": 1,
+			"position": [0, 0],
+			"parameters": {}
+		}],
+		"connections": {},
+		"settings": {
+			"executionOrder": "v1"
+		},
+		"meta": {
+			"templateCredsSetupCompleted": false
+		},
+		"tags": []
+	}`
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("expected POST request, got %s", r.Method)
+		}
+		if r.URL.Path != "/api/v1/workflows" {
+			t.Errorf("unexpected URL path: %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusOK)
+		if _, err := w.Write([]byte(mockResponse)); err != nil {
+			t.Errorf("failed to write response: %v", err)
+		}
+	})
+
+	ts := httptest.NewServer(handler)
+	defer ts.Close()
+
+	token := "test-token"
+	client, err := NewClient(&ts.URL, &token)
+	require.NoError(t, err)
+
+	createReq := &CreateWorkflowRequest{
+		Name: "Test Workflow",
+		Nodes: []Node{
+			{
+				ID:          "1",
+				Name:        "Start",
+				Type:        "n8n-nodes-base.start",
+				TypeVersion: 1,
+				Position:    []int{0, 0},
+				Parameters:  map[string]interface{}{},
+			},
+		},
+		Connections: map[string]Connection{},
+		Settings: Settings{
+			ExecutionOrder: "v1",
+		},
+	}
+
+	workflow, err := client.CreateWorkflow(createReq)
+	require.NoError(t, err)
+	require.NotNil(t, workflow)
+
+	if workflow.ID != "123456" || workflow.Name != "Test Workflow" || workflow.Active {
 		t.Errorf("unexpected workflow data: %+v", workflow)
 	}
 }
