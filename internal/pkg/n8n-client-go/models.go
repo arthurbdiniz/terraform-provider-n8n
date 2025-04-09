@@ -126,3 +126,12 @@ type Meta struct {
 	// TemplateCredsSetupCompleted indicates whether the setup for template credentials is complete.
 	TemplateCredsSetupCompleted bool `json:"templateCredsSetupCompleted"`
 }
+
+// CreateWorkflowRequest defines the allowed fields when creating a workflow.
+type CreateWorkflowRequest struct {
+	Name        string                `json:"name"`
+	Nodes       []Node                `json:"nodes"`
+	Connections map[string]Connection `json:"connections"`
+	Settings    Settings              `json:"settings"`
+	// StaticData   interface{}           `json:"staticData"` // TODO understand how this parameter is used and make it exportable to the state
+}
