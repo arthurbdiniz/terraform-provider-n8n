@@ -4,9 +4,7 @@
 package n8n
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/arthurbdiniz/terraform-provider-n8n/internal/config"
@@ -20,11 +18,7 @@ func TestIntegrationGetWorkflows(t *testing.T) {
 	require.NoError(t, err)
 
 	// Ensure container is cleaned up after the test
-	defer func() {
-		if err := helpers.TerminateContainer(context.Background(), container); err != nil {
-			fmt.Println("Error when terminating container:", err)
-		}
-	}()
+	defer helpers.DeferTerminate(container)()
 
 	client, err := NewClient(&url, &config.ApiToken)
 	if err != nil {
@@ -47,11 +41,7 @@ func TestIntegrationCreateWorkflow(t *testing.T) {
 	container, url, err := helpers.CreateTestContainer()
 	require.NoError(t, err)
 
-	defer func() {
-		if err := helpers.TerminateContainer(context.Background(), container); err != nil {
-			fmt.Println("Error when terminating container:", err)
-		}
-	}()
+	defer helpers.DeferTerminate(container)()
 
 	// Create a client for the running container
 	client, err := NewClient(&url, &config.ApiToken)
@@ -89,11 +79,7 @@ func TestIntegrationCreateWorkflowWithMultiNodeConnections(t *testing.T) {
 	container, url, err := helpers.CreateTestContainer()
 	require.NoError(t, err)
 
-	defer func() {
-		if err := helpers.TerminateContainer(context.Background(), container); err != nil {
-			fmt.Println("Error when terminating container:", err)
-		}
-	}()
+	defer helpers.DeferTerminate(container)()
 
 	client, err := NewClient(&url, &config.ApiToken)
 	require.NoError(t, err)

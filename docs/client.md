@@ -17,12 +17,14 @@ The package also includes an HTTP client to facilitate communication with the n8
 - [type Client](<#Client>)
   - [func NewClient\(host \*string, token \*string\) \(\*Client, error\)](<#NewClient>)
   - [func \(c \*Client\) ActivateWorkflow\(workflowID string\) \(\*Workflow, error\)](<#Client.ActivateWorkflow>)
+  - [func \(c \*Client\) CreateWorkflow\(createWorkflowRequest \*CreateWorkflowRequest\) \(\*Workflow, error\)](<#Client.CreateWorkflow>)
   - [func \(c \*Client\) DeactivateWorkflow\(workflowID string\) \(\*Workflow, error\)](<#Client.DeactivateWorkflow>)
   - [func \(c \*Client\) DeleteWorkflow\(workflowID string\) \(\*Workflow, error\)](<#Client.DeleteWorkflow>)
   - [func \(c \*Client\) GetWorkflow\(workflowID string\) \(\*Workflow, error\)](<#Client.GetWorkflow>)
   - [func \(c \*Client\) GetWorkflows\(\) \(\*WorkflowsResponse, error\)](<#Client.GetWorkflows>)
 - [type Connection](<#Connection>)
 - [type ConnectionDetail](<#ConnectionDetail>)
+- [type CreateWorkflowRequest](<#CreateWorkflowRequest>)
 - [type Meta](<#Meta>)
 - [type Node](<#Node>)
 - [type Settings](<#Settings>)
@@ -73,6 +75,21 @@ Parameters:
 - workflowID: the unique identifier of the workflow to activate.
 
 Returns the updated Workflow object, or an error if the request or decoding fails.
+
+<a name="Client.CreateWorkflow"></a>
+### func \(\*Client\) CreateWorkflow
+
+```go
+func (c *Client) CreateWorkflow(createWorkflowRequest *CreateWorkflowRequest) (*Workflow, error)
+```
+
+CreateWorkflow sends a request to create a new workflow in n8n. It accepts a CreateWorkflowRequest object and returns the created Workflow with its assigned ID and metadata.
+
+Parameters:
+
+- createWorkflowRequest: the workflow data to be created.
+
+Returns the created Workflow object or an error if the request or decoding fails.
 
 <a name="Client.DeactivateWorkflow"></a>
 ### func \(\*Client\) DeactivateWorkflow
@@ -158,6 +175,20 @@ type ConnectionDetail struct {
 
     // Index is the positional index of the connection in a list.
     Index int `json:"index"`
+}
+```
+
+<a name="CreateWorkflowRequest"></a>
+## type CreateWorkflowRequest
+
+CreateWorkflowRequest defines the allowed fields when creating a workflow.
+
+```go
+type CreateWorkflowRequest struct {
+    Name        string                `json:"name"`
+    Nodes       []Node                `json:"nodes"`
+    Connections map[string]Connection `json:"connections"`
+    Settings    Settings              `json:"settings"`
 }
 ```
 
