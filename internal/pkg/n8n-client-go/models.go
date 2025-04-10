@@ -135,3 +135,12 @@ type CreateWorkflowRequest struct {
 	Settings    Settings              `json:"settings"`
 	// StaticData   interface{}           `json:"staticData"` // TODO understand how this parameter is used and make it exportable to the state
 }
+
+// UpdateWorkflowRequest defines the allowed fields when updating a workflow.
+type UpdateWorkflowRequest struct {
+	Name        string                `json:"name"`
+	Nodes       []Node                `json:"nodes"`
+	Connections map[string]Connection `json:"connections"`
+	Settings    Settings              `json:"settings"`
+	// StaticData   interface{}           `json:"staticData"` // TODO understand how this parameter is used and make it exportable to the state
+}
