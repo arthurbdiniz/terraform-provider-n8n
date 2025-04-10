@@ -4,6 +4,7 @@
 package n8n
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"path"
@@ -273,4 +274,111 @@ func TestCreateWorkflow(t *testing.T) {
 	if workflow.ID != "123456" || workflow.Name != "Test Workflow" || workflow.Active {
 		t.Errorf("unexpected workflow data: %+v", workflow)
 	}
+}
+
+func TestUpdateWorkflow(t *testing.T) {
+	mockResponse := `{
+		"id": "123456",
+		"name": "Updated Workflow",
+		"active": false,
+		"nodes": [{
+			"id": "1",
+			"name": "Start",
+			"type": "n8n-nodes-base.start",
+			"typeVersion": 1,
+			"position": [0, 0],
+			"parameters": {}
+		}, {
+			"id": "2",
+			"name": "Set Node",
+			"type": "n8n-nodes-base.set",
+			"typeVersion": 1,
+			"position": [300, 0],
+			"parameters": {
+				"values": {
+					"string": [{
+						"name": "key",
+						"value": "value"
+					}]
+				}
+			}
+		}],
+		"connections": {
+			"Start": {
+				"main": [[{"node": "Set Node", "type": "main", "index": 0}]]
+			}
+		},
+		"settings": {
+			"executionOrder": "v1"
+		},
+		"meta": {
+			"templateCredsSetupCompleted": false
+		},
+		"tags": []
+	}`
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("expected PUT request, got %s", r.Method)
+		}
+		if r.URL.Path != "/api/v1/workflows/123456" {
+			t.Errorf("unexpected URL path: %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusOK)
+		if _, err := w.Write([]byte(mockResponse)); err != nil {
+			t.Errorf("failed to write response: %v", err)
+		}
+	})
+
+	ts := httptest.NewServer(handler)
+	defer ts.Close()
+
+	token := "test-token"
+	client, err := NewClient(&ts.URL, &token)
+	require.NoError(t, err)
+
+	updateReq := &UpdateWorkflowRequest{
+		Name: "Updated Workflow",
+		Nodes: []Node{
+			{
+				ID:          "1",
+				Name:        "Start",
+				Type:        "n8n-nodes-base.start",
+				TypeVersion: 1,
+				Position:    []int{0, 0},
+				Parameters:  map[string]interface{}{},
+			},
+			{
+				ID:          "2",
+				Name:        "Set Node",
+				Type:        "n8n-nodes-base.set",
+				TypeVersion: 1,
+				Position:    []int{300, 0},
+				Parameters: map[string]interface{}{
+					"values": map[string]interface{}{
+						"string": []map[string]interface{}{
+							{"name": "key", "value": "value"},
+						},
+					},
+				},
+			},
+		},
+		Connections: map[string]Connection{
+			"Start": {
+				Main: json.RawMessage(`[[{"node":"Set Node","type":"main","index":0}]]`),
+			},
+		},
+		Settings: Settings{
+			ExecutionOrder: "v1",
+		},
+	}
+
+	workflow, err := client.UpdateWorkflow("123456", updateReq)
+	require.NoError(t, err)
+	require.NotNil(t, workflow)
+
+	require.Equal(t, "123456", workflow.ID)
+	require.Equal(t, "Updated Workflow", workflow.Name)
+	require.Len(t, workflow.Nodes, 2)
+	require.Equal(t, "Set Node", workflow.Nodes[1].Name)
 }
