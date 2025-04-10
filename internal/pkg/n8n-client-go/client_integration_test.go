@@ -143,3 +143,79 @@ func TestIntegrationCreateWorkflowWithMultiNodeConnections(t *testing.T) {
 	require.NotEmpty(t, createdWorkflow.ID, "workflow ID should be set")
 	require.Len(t, createdWorkflow.Nodes, 3, "workflow should have 3 nodes")
 }
+
+func TestIntegrationUpdateWorkflow(t *testing.T) {
+	// Start the n8n container for testing
+	container, url, err := helpers.CreateTestContainer()
+	require.NoError(t, err)
+
+	defer helpers.DeferTerminate(container)()
+
+	client, err := NewClient(&url, &config.ApiToken)
+	require.NoError(t, err)
+
+	initialWorkflow := &CreateWorkflowRequest{
+		Name: "Original Workflow",
+		Nodes: []Node{
+			{
+				ID:          "1",
+				Name:        "Start",
+				Type:        "n8n-nodes-base.start",
+				TypeVersion: 1,
+				Position:    []int{0, 0},
+				Parameters:  map[string]interface{}{},
+			},
+		},
+		Connections: map[string]Connection{},
+		Settings: Settings{
+			ExecutionOrder: "v1",
+		},
+	}
+
+	createdWorkflow, err := client.CreateWorkflow(initialWorkflow)
+	require.NoError(t, err, "error creating workflow")
+	require.NotNil(t, createdWorkflow, "workflow should be created")
+
+	updateRequest := &UpdateWorkflowRequest{
+		Name: "Updated Workflow",
+		Nodes: []Node{
+			{
+				ID:          "1",
+				Name:        "Start",
+				Type:        "n8n-nodes-base.start",
+				TypeVersion: 1,
+				Position:    []int{0, 0},
+				Parameters:  map[string]interface{}{},
+			},
+			{
+				ID:          "2",
+				Name:        "Set Node",
+				Type:        "n8n-nodes-base.set",
+				TypeVersion: 1,
+				Position:    []int{300, 0},
+				Parameters: map[string]interface{}{
+					"values": map[string]interface{}{
+						"string": []map[string]interface{}{
+							{"name": "key", "value": "value"},
+						},
+					},
+				},
+			},
+		},
+		Connections: map[string]Connection{
+			"Start": {
+				Main: json.RawMessage(`[[{"node":"Set Node","type":"main","index":0}]]`),
+			},
+		},
+		Settings: Settings{
+			ExecutionOrder: "v1",
+		},
+	}
+
+	updatedWorkflow, err := client.UpdateWorkflow(createdWorkflow.ID, updateRequest)
+	require.NoError(t, err, "error updating workflow")
+	require.NotNil(t, updatedWorkflow, "updated workflow should not be nil")
+	require.Equal(t, updateRequest.Name, updatedWorkflow.Name, "workflow name should be updated")
+	require.Len(t, updatedWorkflow.Nodes, 2, "workflow should have 2 nodes after update")
+	require.Equal(t, "Set Node", updatedWorkflow.Nodes[1].Name, "second node name should match")
+}
