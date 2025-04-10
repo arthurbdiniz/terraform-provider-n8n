@@ -173,6 +173,45 @@ func (c *Client) CreateWorkflow(createWorkflowRequest *CreateWorkflowRequest) (*
 
 	// Create the HTTP POST request
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/workflows", c.HostURL), bytes.NewReader(payload))
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	// Perform the request
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	// Decode the response into a Workflow
+	workflow := &Workflow{}
+	if err := json.Unmarshal(body, workflow); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return workflow, nil
+}
+
+// UpdateWorkflow sends a request to update an existing workflow in n8n.
+// It accepts the workflow ID and an UpdateWorkflowRequest object, then returns the updated Workflow with its assigned ID and metadata.
+//
+// Parameters:
+//   - id: the ID of the workflow to be updated.
+//   - updateWorkflowRequest: the updated workflow data.
+//
+// Returns the updated Workflow object or an error if the request or decoding fails.
+func (c *Client) UpdateWorkflow(id string, updateWorkflowRequest *UpdateWorkflowRequest) (*Workflow, error) {
+	// Marshal the updated workflow into JSON
+	payload, err := json.Marshal(updateWorkflowRequest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal updated workflow: %w", err)
+	}
+
+	// Create the HTTP PUT request
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/v1/workflows/%s", c.HostURL, id), bytes.NewReader(payload))
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
