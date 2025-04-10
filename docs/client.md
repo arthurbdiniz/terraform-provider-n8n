@@ -22,6 +22,7 @@ The package also includes an HTTP client to facilitate communication with the n8
   - [func \(c \*Client\) DeleteWorkflow\(workflowID string\) \(\*Workflow, error\)](<#Client.DeleteWorkflow>)
   - [func \(c \*Client\) GetWorkflow\(workflowID string\) \(\*Workflow, error\)](<#Client.GetWorkflow>)
   - [func \(c \*Client\) GetWorkflows\(\) \(\*WorkflowsResponse, error\)](<#Client.GetWorkflows>)
+  - [func \(c \*Client\) UpdateWorkflow\(id string, updateWorkflowRequest \*UpdateWorkflowRequest\) \(\*Workflow, error\)](<#Client.UpdateWorkflow>)
 - [type Connection](<#Connection>)
 - [type ConnectionDetail](<#ConnectionDetail>)
 - [type CreateWorkflowRequest](<#CreateWorkflowRequest>)
@@ -29,6 +30,7 @@ The package also includes an HTTP client to facilitate communication with the n8
 - [type Node](<#Node>)
 - [type Settings](<#Settings>)
 - [type Tag](<#Tag>)
+- [type UpdateWorkflowRequest](<#UpdateWorkflowRequest>)
 - [type Workflow](<#Workflow>)
 - [type WorkflowsResponse](<#WorkflowsResponse>)
 
@@ -147,6 +149,22 @@ GetWorkflows retrieves all workflows from your n8n instance. This method support
 
 Returns a pointer to a WorkflowsResponse containing all workflows, or an error if the request or response decoding fails.
 
+<a name="Client.UpdateWorkflow"></a>
+### func \(\*Client\) UpdateWorkflow
+
+```go
+func (c *Client) UpdateWorkflow(id string, updateWorkflowRequest *UpdateWorkflowRequest) (*Workflow, error)
+```
+
+UpdateWorkflow sends a request to update an existing workflow in n8n. It accepts the workflow ID and an UpdateWorkflowRequest object, then returns the updated Workflow with its assigned ID and metadata.
+
+Parameters:
+
+- id: the ID of the workflow to be updated.
+- updateWorkflowRequest: the updated workflow data.
+
+Returns the updated Workflow object or an error if the request or decoding fails.
+
 <a name="Connection"></a>
 ## type Connection
 
@@ -261,6 +279,20 @@ type Tag struct {
 
     // Name is the name of the tag.
     Name string `json:"name"`
+}
+```
+
+<a name="UpdateWorkflowRequest"></a>
+## type UpdateWorkflowRequest
+
+UpdateWorkflowRequest defines the allowed fields when updating a workflow.
+
+```go
+type UpdateWorkflowRequest struct {
+    Name        string                `json:"name"`
+    Nodes       []Node                `json:"nodes"`
+    Connections map[string]Connection `json:"connections"`
+    Settings    Settings              `json:"settings"`
 }
 ```
 
