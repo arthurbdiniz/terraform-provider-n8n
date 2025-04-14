@@ -219,3 +219,82 @@ func TestIntegrationUpdateWorkflow(t *testing.T) {
 	require.Len(t, updatedWorkflow.Nodes, 2, "workflow should have 2 nodes after update")
 	require.Equal(t, "Set Node", updatedWorkflow.Nodes[1].Name, "second node name should match")
 }
+
+func TestIntegrationDeleteWorkflow(t *testing.T) {
+	container, url, err := helpers.CreateTestContainer()
+	require.NoError(t, err)
+
+	defer helpers.DeferTerminate(container)()
+
+	client, err := NewClient(&url, &config.ApiToken)
+	require.NoError(t, err)
+
+	// Create a workflow to delete
+	newWorkflow := &CreateWorkflowRequest{
+		Name: "Workflow to Delete",
+		Nodes: []Node{{
+			ID:          "1",
+			Name:        "Start",
+			Type:        "n8n-nodes-base.start",
+			TypeVersion: 1,
+			Position:    []int{0, 0},
+			Parameters:  map[string]interface{}{},
+		}},
+		Connections: map[string]Connection{},
+		Settings:    Settings{ExecutionOrder: "v1"},
+	}
+	createdWorkflow, err := client.CreateWorkflow(newWorkflow)
+	require.NoError(t, err)
+
+	// Delete the workflow
+	deleted, err := client.DeleteWorkflow(createdWorkflow.ID)
+	require.NoError(t, err)
+	require.Equal(t, createdWorkflow.ID, deleted.ID)
+}
+
+func TestIntegrationActivateDeactivateWorkflow(t *testing.T) {
+	container, url, err := helpers.CreateTestContainer()
+	require.NoError(t, err)
+
+	defer helpers.DeferTerminate(container)()
+
+	client, err := NewClient(&url, &config.ApiToken)
+	require.NoError(t, err)
+
+	// Create workflow
+	newWorkflow := &CreateWorkflowRequest{
+		Name: "Workflow to Activate",
+		Nodes: []Node{{
+			ID:          "1",
+			Name:        "Schedule Trigger",
+			Type:        "n8n-nodes-base.scheduleTrigger",
+			TypeVersion: 1,
+			Position:    []int{0, 0},
+			Parameters: map[string]interface{}{
+				"rule": map[string]interface{}{
+					"interval": []interface{}{
+						map[string]interface{}{},
+					},
+				},
+			},
+		}},
+		Connections: map[string]Connection{},
+		Settings:    Settings{ExecutionOrder: "v1"},
+	}
+
+	createdWorkflow, err := client.CreateWorkflow(newWorkflow)
+	require.NoError(t, err)
+	require.False(t, createdWorkflow.Active)
+
+	// Activate the workflow
+	activated, err := client.ActivateWorkflow(createdWorkflow.ID)
+	require.NoError(t, err)
+	require.True(t, activated.Active)
+	require.Equal(t, createdWorkflow.ID, activated.ID)
+
+	// Deactivate the workflow
+	deactivated, err := client.DeactivateWorkflow(createdWorkflow.ID)
+	require.NoError(t, err)
+	require.False(t, deactivated.Active)
+	require.Equal(t, createdWorkflow.ID, deactivated.ID)
+}
