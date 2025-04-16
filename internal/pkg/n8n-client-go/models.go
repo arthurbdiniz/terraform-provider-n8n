@@ -114,8 +114,14 @@ type Node struct {
 
 // Settings contains global execution settings for a workflow.
 type Settings struct {
-	// ExecutionOrder defines how the workflow nodes should be executed.
-	ExecutionOrder string `json:"executionOrder"`
+	SaveExecutionProgress    bool   `json:"saveExecutionProgress"`
+	SaveManualExecutions     bool   `json:"saveManualExecutions"`
+	SaveDataErrorExecution   string `json:"saveDataErrorExecution"`   // Enum: "all", "none"
+	SaveDataSuccessExecution string `json:"saveDataSuccessExecution"` // Enum: "all", "none"
+	ExecutionTimeout         int    `json:"executionTimeout"`         // maxLength: 3600
+	ErrorWorkflow            string `json:"errorWorkflow"`
+	Timezone                 string `json:"timezone"`
+	ExecutionOrder           string `json:"executionOrder"`
 }
 
 // CreateWorkflowRequest defines the allowed fields when creating a workflow.
