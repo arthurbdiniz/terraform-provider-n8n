@@ -62,7 +62,13 @@ func TestIntegrationCreateWorkflow(t *testing.T) {
 		},
 		Connections: map[string]Connection{},
 		Settings: Settings{
-			ExecutionOrder: "v1",
+			SaveExecutionProgress:    true,
+			SaveManualExecutions:     true,
+			SaveDataErrorExecution:   "all",
+			SaveDataSuccessExecution: "all",
+			ExecutionTimeout:         3600,
+			Timezone:                 "America/New_York",
+			ExecutionOrder:           "v1",
 		},
 	}
 
@@ -131,7 +137,13 @@ func TestIntegrationCreateWorkflowWithMultiNodeConnections(t *testing.T) {
 			},
 		},
 		Settings: Settings{
-			ExecutionOrder: "v1",
+			SaveExecutionProgress:    true,
+			SaveManualExecutions:     true,
+			SaveDataErrorExecution:   "all",
+			SaveDataSuccessExecution: "all",
+			ExecutionTimeout:         3600,
+			Timezone:                 "America/New_York",
+			ExecutionOrder:           "v1",
 		},
 	}
 
@@ -168,7 +180,13 @@ func TestIntegrationUpdateWorkflow(t *testing.T) {
 		},
 		Connections: map[string]Connection{},
 		Settings: Settings{
-			ExecutionOrder: "v1",
+			SaveExecutionProgress:    true,
+			SaveManualExecutions:     true,
+			SaveDataErrorExecution:   "all",
+			SaveDataSuccessExecution: "all",
+			ExecutionTimeout:         3600,
+			Timezone:                 "America/New_York",
+			ExecutionOrder:           "v1",
 		},
 	}
 
@@ -208,7 +226,13 @@ func TestIntegrationUpdateWorkflow(t *testing.T) {
 			},
 		},
 		Settings: Settings{
-			ExecutionOrder: "v1",
+			SaveExecutionProgress:    true,
+			SaveManualExecutions:     true,
+			SaveDataErrorExecution:   "all",
+			SaveDataSuccessExecution: "all",
+			ExecutionTimeout:         3600,
+			Timezone:                 "America/New_York",
+			ExecutionOrder:           "v1",
 		},
 	}
 
