@@ -26,7 +26,6 @@ The package also includes an HTTP client to facilitate communication with the n8
 - [type Connection](<#Connection>)
 - [type ConnectionDetail](<#ConnectionDetail>)
 - [type CreateWorkflowRequest](<#CreateWorkflowRequest>)
-- [type Meta](<#Meta>)
 - [type Node](<#Node>)
 - [type Settings](<#Settings>)
 - [type Tag](<#Tag>)
@@ -210,18 +209,6 @@ type CreateWorkflowRequest struct {
 }
 ```
 
-<a name="Meta"></a>
-## type Meta
-
-Meta contains additional metadata about the workflow's setup status.
-
-```go
-type Meta struct {
-    // TemplateCredsSetupCompleted indicates whether the setup for template credentials is complete.
-    TemplateCredsSetupCompleted bool `json:"templateCredsSetupCompleted"`
-}
-```
-
 <a name="Node"></a>
 ## type Node
 
@@ -256,8 +243,14 @@ Settings contains global execution settings for a workflow.
 
 ```go
 type Settings struct {
-    // ExecutionOrder defines how the workflow nodes should be executed.
-    ExecutionOrder string `json:"executionOrder"`
+    SaveExecutionProgress    bool   `json:"saveExecutionProgress"`
+    SaveManualExecutions     bool   `json:"saveManualExecutions"`
+    SaveDataErrorExecution   string `json:"saveDataErrorExecution"`   // Enum: "all", "none"
+    SaveDataSuccessExecution string `json:"saveDataSuccessExecution"` // Enum: "all", "none"
+    ExecutionTimeout         int    `json:"executionTimeout"`         // maxLength: 3600
+    ErrorWorkflow            string `json:"errorWorkflow"`
+    Timezone                 string `json:"timezone"`
+    ExecutionOrder           string `json:"executionOrder"`
 }
 ```
 
@@ -333,9 +326,6 @@ type Workflow struct {
 
     // Settings contains configuration options for workflow execution.
     Settings Settings `json:"settings"`
-
-    // Meta provides metadata about the workflow.
-    Meta Meta `json:"meta"`
 
     // Tags is a list of tags associated with the workflow for categorization.
     Tags []Tag `json:"tags"`
