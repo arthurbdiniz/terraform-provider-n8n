@@ -33,22 +33,13 @@ Read-Only:
 - `connections` (String) Raw JSON representation of connections between nodes.
 - `created_at` (String) Timestamp when the workflow was created.
 - `id` (String) Unique identifier of the workflow.
-- `meta` (Attributes) Workflow metadata. (see [below for nested schema](#nestedatt--workflows--meta))
 - `name` (String) Name of the workflow.
 - `nodes` (Attributes List) List of nodes in the workflow. (see [below for nested schema](#nestedatt--workflows--nodes))
-- `settings` (Attributes) Workflow settings. (see [below for nested schema](#nestedatt--workflows--settings))
+- `settings` (Attributes) Global execution settings for the workflow. (see [below for nested schema](#nestedatt--workflows--settings))
 - `tags` (Attributes List) Tags associated with the workflow. (see [below for nested schema](#nestedatt--workflows--tags))
 - `trigger_count` (Number) Number of times the workflow has been triggered.
 - `updated_at` (String) Timestamp when the workflow was last updated.
 - `version_id` (String) Identifier of the current version of the workflow.
-
-<a id="nestedatt--workflows--meta"></a>
-### Nested Schema for `workflows.meta`
-
-Read-Only:
-
-- `template_creds_setup_completed` (Boolean) Indicates if credentials setup is completed.
-
 
 <a id="nestedatt--workflows--nodes"></a>
 ### Nested Schema for `workflows.nodes`
@@ -78,7 +69,14 @@ Read-Only:
 
 Read-Only:
 
-- `execution_order` (String) Execution order setting.
+- `error_workflow` (String) The ID of the workflow that contains the error trigger node.
+- `execution_order` (String) Defines the order in which the workflow nodes are executed. Valid options could include 'v1', 'v2', etc.
+- `execution_timeout` (Number) Defines the execution timeout in seconds. Max value: 3600.
+- `save_data_error_execution` (String) Defines the saving behavior for executions with data errors. Options: 'all', 'none'.
+- `save_data_success_execution` (String) Defines the saving behavior for executions with data success. Options: 'all', 'none'.
+- `save_execution_progress` (Boolean) Determines whether the execution progress is saved.
+- `save_manual_executions` (Boolean) Indicates whether manual executions are saved.
+- `timezone` (String) The timezone for the workflow. Example: 'America/New_York'.
 
 
 <a id="nestedatt--workflows--tags"></a>
