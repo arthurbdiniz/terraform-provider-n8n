@@ -39,9 +39,6 @@ type Workflow struct {
 	// Settings contains configuration options for workflow execution.
 	Settings Settings `json:"settings"`
 
-	// Meta provides metadata about the workflow.
-	Meta Meta `json:"meta"`
-
 	// Tags is a list of tags associated with the workflow for categorization.
 	Tags []Tag `json:"tags"`
 	// PinData      interface{}           `json:"pinData"`  // TODO understand how this parameter is used and make it exportable to the state
@@ -119,12 +116,6 @@ type Node struct {
 type Settings struct {
 	// ExecutionOrder defines how the workflow nodes should be executed.
 	ExecutionOrder string `json:"executionOrder"`
-}
-
-// Meta contains additional metadata about the workflow's setup status.
-type Meta struct {
-	// TemplateCredsSetupCompleted indicates whether the setup for template credentials is complete.
-	TemplateCredsSetupCompleted bool `json:"templateCredsSetupCompleted"`
 }
 
 // CreateWorkflowRequest defines the allowed fields when creating a workflow.
