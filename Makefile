@@ -1,3 +1,6 @@
+TEST_ARGS ?= -v -cover -coverprofile=coverage.out -timeout=120s -parallel=10
+
+
 default: fmt lint install generate
 
 build:
@@ -15,13 +18,16 @@ generate:
 fmt:
 	gofmt -s -w -e .
 
-test:
-	go test -v -cover -coverprofile=coverage.out -timeout=120s -parallel=10 ./...
-
 coverage-html:
 	go tool cover -html=coverage.out -o coverage.html
 
-testacc:
-	TF_ACC=1 go test -v -cover -timeout 120m ./...
+test:
+	@if [ "$(ACC)" = "1" ]; then \
+		echo "Running acceptance tests..."; \
+		TF_ACC=1 go test $(TEST_ARGS) ./...; \
+	else \
+		echo "Running unit tests..."; \
+		go test $(TEST_ARGS) ./...; \
+	fi
 
-.PHONY: fmt lint test testacc build install generate
+.PHONY: fmt lint test build install generate
