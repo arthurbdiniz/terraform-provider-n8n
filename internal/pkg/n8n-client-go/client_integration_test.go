@@ -265,7 +265,11 @@ func TestIntegrationDeleteWorkflow(t *testing.T) {
 			Parameters:  map[string]interface{}{},
 		}},
 		Connections: map[string]Connection{},
-		Settings:    Settings{ExecutionOrder: "v1"},
+		Settings: Settings{
+			ExecutionOrder:           "v1",
+			SaveDataErrorExecution:   "all",
+			SaveDataSuccessExecution: "all",
+		},
 	}
 	createdWorkflow, err := client.CreateWorkflow(newWorkflow)
 	require.NoError(t, err)
@@ -303,7 +307,11 @@ func TestIntegrationActivateDeactivateWorkflow(t *testing.T) {
 			},
 		}},
 		Connections: map[string]Connection{},
-		Settings:    Settings{ExecutionOrder: "v1"},
+		Settings: Settings{
+			ExecutionOrder:           "v1",
+			SaveDataErrorExecution:   "all",
+			SaveDataSuccessExecution: "all",
+		},
 	}
 
 	createdWorkflow, err := client.CreateWorkflow(newWorkflow)
