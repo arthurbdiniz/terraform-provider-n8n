@@ -28,6 +28,11 @@ provider "n8n" {
 - `host` (String) URI for n8n API. May also be provided via `N8N_HOST` environment variable.
 - `token` (String, Sensitive) Token for n8n API. May also be provided via `N8N_TOKEN` environment variable.
 
+### data-sources
+
+- [workflow](./data-sources/workflow.md)
+- [workflows](./data-sources/workflows.md)
+
 ---
 
 ## n8n-client-go

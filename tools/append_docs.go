@@ -25,6 +25,11 @@ func main() {
 	defer f.Close()
 
 	customContent := `
+### data-sources
+
+- [workflow](./data-sources/workflow.md)
+- [workflows](./data-sources/workflows.md)
+
 ---
 
 ## n8n-client-go
